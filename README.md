@@ -4,7 +4,7 @@
 
 ## Usage
 
-Make a `GET` request to `https://cockato.corenzan.com/` followed by someone's username on Twitter, optionally suffixed with the desired format - currently supported `html` (default), `txt`, and `json`. Responses are cached for **1 hour**.
+Make a `GET` request to `https://cockatoo.corenzan.com/` followed by someone's username on Twitter, optionally suffixed with the desired format - currently supported `html` (default), `txt`, and `json`. Responses are cached for **1 hour**.
 
 ### Examples
 
