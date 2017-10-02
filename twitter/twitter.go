@@ -10,9 +10,10 @@ import (
 	"time"
 )
 
-var ua = "Cockatoo/1.0"
-
-var endpoint = "https://api.twitter.com"
+var (
+	ua       = "Cockatoo/1.0"
+	endpoint = "https://api.twitter.com"
+)
 
 type Client struct {
 	key, secret string
