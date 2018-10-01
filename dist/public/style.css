@@ -1,0 +1,170 @@
+html {
+  font-size: 16px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+body {
+  color: hsl(138, 38%, 12%);
+  font-family: Zilla Slab, monospace;
+}
+
+code {
+  font-size: 0.875em;
+}
+
+/* - */
+/* - */
+/* - */
+
+.content {
+  margin: 5% auto;
+  max-width: 45rem;
+}
+
+.splash,
+.footer,
+.section {
+  padding: 3rem 1.5rem;
+}
+
+.section {
+  -webkit-clip-path: polygon(
+    0 1.5rem,
+    100% 0,
+    100% calc(100% - 1.5rem),
+    0 100%
+  );
+  clip-path: polygon(0 1.5rem, 100% 0, 100% calc(100% - 1.5rem), 0 100%);
+}
+
+.section:nth-child(2n + 1) {
+  background-color: whitesmoke;
+}
+
+/* - */
+/* - */
+/* - */
+
+.splash {
+  background: ivory url(/pentagon.png);
+  -webkit-clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.5rem), 0 100%);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.5rem), 0 100%);
+  text-align: center;
+}
+
+.splash h1 {
+  font: 4.5em/1.5 Unlock, cursive;
+}
+
+@media (min-width: 768px) {
+  .splash h1 {
+    font-size: 6em;
+  }
+}
+
+.splash h1 + p {
+  font-size: 1.5em;
+  margin: 2.25rem 0 1.5rem;
+}
+
+/* - */
+/* - */
+/* - */
+
+.code code {
+  background-color: hsla(138, 78%, 96%, 0.5);
+  display: inline-block;
+  padding: 1.5em 2.125em;
+}
+
+.code .verb {
+  color: hsl(138, 78%, 46%);
+}
+
+.code .url {
+  color: hsl(203, 78%, 46%);
+}
+
+.code .json {
+  color: hsl(0, 78%, 46%);
+}
+
+/* - */
+/* - */
+/* - */
+
+.content h2 {
+  font-size: 2em;
+  font-weight: bolder;
+  text-align: center;
+}
+
+.content h3 {
+  font-size: 1.15em;
+  font-weight: bolder;
+}
+
+.content > * + * {
+  margin-top: 1.5rem;
+}
+
+.content > h2 + *,
+.content > * + h3 {
+  margin-top: 2.25rem;
+}
+
+.content ol,
+.content ul {
+  padding-left: 1rem;
+}
+
+.content li ul,
+.content li ol,
+.content li + li {
+  margin-top: 0.75rem;
+}
+
+.content ul {
+  list-style: circle;
+}
+
+.content ol {
+  list-style: lower-latin;
+}
+
+/* - */
+/* - */
+/* - */
+
+table {
+  border: 1px solid gainsboro;
+  width: 100%;
+}
+
+th,
+td {
+  border: 1px solid gainsboro;
+  padding: 0.5rem 0.75rem;
+}
+
+/* - */
+/* - */
+/* - */
+
+.footer {
+  text-align: center;
+}
+
+.footer .content {
+  margin: 3% auto;
+}
+
+.footer a {
+  color: hsl(138, 78%, 26%);
+  text-decoration: underline;
+}
