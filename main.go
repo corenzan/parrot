@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	routeRegexp = regexp.MustCompile(`^/(\w+)(|\.txt|\.html|.json)$`)
+	routeRegexp = regexp.MustCompile(`^/(\w+)(|\.txt|\.html|\.json)$`)
 	urlRegexp   = regexp.MustCompile(`https?://\S+`)
 )
 
