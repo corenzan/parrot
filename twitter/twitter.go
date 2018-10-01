@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ua       = "Cockatoo/1.0"
+	ua       = "Parrot/1.0"
 	endpoint = "https://api.twitter.com"
 )
 

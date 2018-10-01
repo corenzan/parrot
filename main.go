@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/corenzan/cockatoo/twitter"
+	"github.com/corenzan/parrot/twitter"
 	"github.com/patrickmn/go-cache"
 	"log"
 	"net/http"
@@ -17,12 +17,12 @@ var (
 	urlRegexp   = regexp.MustCompile(`https?://\S+`)
 )
 
-type Cockatoo struct {
+type Parrot struct {
 	twitter *twitter.Client
 	cache   *cache.Cache
 }
 
-func (c *Cockatoo) autoLink(text string) string {
+func (p *Parrot) autoLink(text string) string {
 	return urlRegexp.ReplaceAllStringFunc(text, func(src string) string {
 		URL, err := url.Parse(src)
 		if err != nil {
@@ -35,7 +35,7 @@ func (c *Cockatoo) autoLink(text string) string {
 	})
 }
 
-func (c *Cockatoo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (p *Parrot) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	parts := routeRegexp.FindSubmatch([]byte(r.URL.Path))
 	if parts == nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -43,12 +43,12 @@ func (c *Cockatoo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	username, format := parts[1], parts[2]
 	var status *twitter.Status
-	cached, found := c.cache.Get(string(username))
+	cached, found := p.cache.Get(string(username))
 	if found {
 		status = cached.(*twitter.Status)
 	} else {
-		status = c.twitter.LastStatus(string(username))
-		c.cache.Set(string(username), status, cache.DefaultExpiration)
+		status = p.twitter.LastStatus(string(username))
+		p.cache.Set(string(username), status, cache.DefaultExpiration)
 	}
 	if status == nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -57,7 +57,7 @@ func (c *Cockatoo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch string(format) {
 	case "", ".html":
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprint(w, c.autoLink(status.Text))
+		fmt.Fprint(w, p.autoLink(status.Text))
 	case ".txt":
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		fmt.Fprint(w, status.Text)
@@ -70,11 +70,11 @@ func (c *Cockatoo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 	key := os.Getenv("TWITTER_KEY")
 	secret := os.Getenv("TWITTER_SECRET")
-	c := &Cockatoo{
+	parrot := &Parrot{
 		twitter.New(key, secret),
 		cache.New(time.Hour, time.Hour),
 	}
-	http.Handle("/", c)
+	http.Handle("/", parrot)
 	port := os.Getenv("PORT")
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

@@ -1,1 +1,1 @@
-web: cockatoo
+web: parrot
