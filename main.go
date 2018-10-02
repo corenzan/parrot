@@ -5,6 +5,7 @@ import (
 	"github.com/corenzan/parrot/twitter"
 	"github.com/patrickmn/go-cache"
 	"log"
+	"mvdan.cc/xurls"
 	"net/http"
 	"net/url"
 	"os"
@@ -14,7 +15,7 @@ import (
 
 var (
 	routeRegexp = regexp.MustCompile(`^/(\w+)(|\.txt|\.html|\.json)$`)
-	urlRegexp   = regexp.MustCompile(`https?://\S+`)
+	urlRegexp   = xurls.Relaxed()
 )
 
 type Parrot struct {
@@ -22,7 +23,7 @@ type Parrot struct {
 	cache   *cache.Cache
 }
 
-func (p *Parrot) autoLink(text string) string {
+func autoLink(text string) string {
 	return urlRegexp.ReplaceAllStringFunc(text, func(src string) string {
 		URL, err := url.Parse(src)
 		if err != nil {
@@ -57,7 +58,7 @@ func (p *Parrot) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch string(format) {
 	case "", ".html":
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprint(w, p.autoLink(status.Text))
+		fmt.Fprint(w, autoLink(status.Text))
 	case ".txt":
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		fmt.Fprint(w, status.Text)
