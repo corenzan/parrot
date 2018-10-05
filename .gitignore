@@ -2,4 +2,4 @@
 .env
 *.swp
 dist/parrot
-vendor/*
+vendor/*/
