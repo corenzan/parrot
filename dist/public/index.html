@@ -1,42 +1,55 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Parrot</title>
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="/resetize.css">
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Zilla+Slab:400,700|Unlock">
-  </head>
-  <body>
-    <header class="splash">
-      <div class="content">
-        <h1>
-          <a href="/">Parrot</a>
-        </h1>
-        <p>Latest social media activity hassle&nbsp;free.</p>
+
+<head>
+  <meta charset="utf-8">
+  <title>Parrot</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="/resetize.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,700|IBM+Plex+Mono:400|Unlock">
+</head>
+
+<body>
+  <header class="splash">
+    <div class="content">
+      <h1>
+        <a href="/">Parrot</a>
+      </h1>
+      <p>Latest social media activity hassle&nbsp;free.</p>
+      <p class="code">
+        <code>
+          <span class="verb">GET</span>
+          <span class="url">https://parrot.crz.li/twitter/parrot.json</span>
+          <br>
+          <span class="json">{ "status": "Praaa! I'm parrot and this is my latest twit!" }</span>
+        </code>
+      </p>
+    </div>
+  </header>
+
+  <section class="section" id="docs">
+    <div class="content">
+      <h2>
+        <a href="#docs">Documentation</a>
+      </h2>
+      <p>Parrot is a an HTTP API to consume limited information from multiple social platforms. The design is
+        intentionally simple
+        and transparent. There's really only one endpoint.</p>
+      <p class="code"><code>GET https://parrot.crz.li/&lt;platform&gt;/&lt;username&gt;.&lt;format&gt</code></p>
+      <p>The response comprises that user's latest activity on that platform in the desired format. For instance,
+        if we were to make a request to.</p>
+      <p class="code"><code>GET https://parrot.crz.li/twitter/geoffkeighley.html</code></p>
+      <p>Parrot would hit the Twitter API, authenticates, get an access token, fetch the latest status from <a href="https://twitter.com/geoffkeighley">@geoffkeighley</a>
+        and return it in format appropriate to be
+        embedded in HTML.
         <p class="code">
           <code>
-            <span class="verb">GET</span>
-            <span class="url">https://parrot.crz.li/twitter/parrot.json</span>
-            <br>
-            <span class="json">{ "status": "Praaa! I'm parrot and this is my latest twit!" }</span>
+            HTTP/1.1 200 OK<br>
+            Content-Type: text/html; charset=utf-8<br><br>
+            Exactly 3 months until &lt;a href="https://twitter.com/thegameawards"&gt;@thegameawards&lt;/a&gt; - can’t believe the show that’s coming together this year!
           </code>
         </p>
-      </div>
-    </header>
-
-    <section class="section" id="docs">
-      <div class="content">
-        <h2>
-          <a href="#docs">Documentation</a>
-        </h2>
-        <p>Parrot is a web service that speaks HTML, JSON, and plain text. The design is intentionally simple and transparent. There's really only one endpoint;</p>
-        <p class="code"><code>GET https://parrot.crz.li/&lt;platform&gt;/&lt;username&gt;.&lt;format&gt</code></p>
-        <p>The response comprises the user's latest activity on the given platform in the desired format. For instance, if we were to make a request to;</p>
-        <p class="code"><code>GET https://parrot.crz.li/twitter/geoffkeighley.html</code></p>
-        <p>Parrot would hit the Twitter API, identify itself, request an access token, fetch the latest status from <a href="https://twitter.com/geoffkeighley">@geoffkeighley</a> and return it in format apropriate to be embedded in HTML;
-        <p class="code"><code>Exactly 3 months until &lt;a href="https://twitter.com/thegameawards"&gt;@thegameawards&lt;/a&gt; - can’t believe the show that’s coming together this year!</code></p>
         <h3>Supported platforms</h3>
         <table>
           <thead>
@@ -59,13 +72,16 @@
             </tr>
           </tbody>
         </table>
-        <p>Some platforms may require additional authentication to work. Such is the case of Instagram which requires the owner of the data to give <strong>explicit permission</strong> to have their data read by Parrot.</p>
+        <p>Some platforms may require additional authentication to work. Such is the case of Instagram which requires
+          the owner of the data to give <strong>explicit permission</strong> to have their data read by Parrot.</p>
         <p>The process is as simple as it can be;</p>
         <ol>
           <li>A request to an unauthenticated profile will get a redirection to the platform's authentication screen.</li>
           <li>From there you will be redirected back to Parrot and the process will be completed.</li>
         </ol>
-        <p>Subsequent requests will now fetch and return the expected results. Please note that although we momentarily cache data to avoid service interruption this authorization will eventually <strong>expire</strong> and it's the user's responsibility to <strong>repeat the authentication procedure</strong>.</p>
+        <p>Subsequent requests will now fetch and return the expected results. Please note that although we momentarily
+          cache data to avoid service interruption this authorization will eventually <strong>expire</strong> and it's
+          the user's responsibility to <strong>repeat the authentication procedure</strong>.</p>
         <h3>Supported formats</h3>
         <table>
           <thead>
@@ -93,84 +109,131 @@
             </tr>
           </tbody>
         </table>
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="section" id="faq">
-      <div class="content">
-        <h2>
-          <a href="#faq">FAQ</a>
-        </h2>
-        <p><strong>Q:</strong> What is Parrot?</p>
-        <p><strong>A:</strong> Parrot is a service that fetches your latest activity on social media to have it embedded elsewhere, like on your blog for instance.</p>
-        <p><strong>Q:</strong> How much does it cost?</p>
-        <p><strong>A:</strong> Currently Parrot is free of charge. As the product matures we might have to find ways to make it sustainable.</p>
-        <p><strong>Q:</strong> What platforms does it work with?</p>
-        <p><strong>A:</strong> Right now it’s just Twitter. We’re actively working on integrating more platforms such as Instagram.</p>
-        <p><strong>Q:</strong> What are the limitations?</p>
-        <p><strong>A:</strong> There are some. Not only because of limitations of the platform itself, but also because of how Parrot was designed. First of all it only works with public data. The content must be cached for a small amount of time (minutes usually, an hour at most) so it’s not in real-time. Also we don’t store historical data, so once the cache is refreshed the previous content is automatically discarded.</p>
-      </div>
-    </section>
+  <section class="section" id="faq">
+    <div class="content">
+      <h2>
+        <a href="#faq">FAQ</a>
+      </h2>
+      <h3>What is Parrot?</h3>
+      <p>Parrot is a service that fetches your latest activity on social media to have it embedded
+        elsewhere, like on your blog for instance.</p>
+      <h3>How much does it cost?</h3>
+      <p>Currently Parrot is free of charge. As the product matures we might have to find ways to
+        make it sustainable.</p>
+      <h3>What platforms does it work with?</h3>
+      <p>Right now it’s just Twitter. We’re actively working on integrating more platforms such as
+        Instagram.</p>
+      <h3>What are the limitations?</h3>
+      <p>There are some. Not only because of limitations of the platform itself, but also because
+        of how Parrot was designed. First of all it only works with public data. The content must be cached for a small
+        amount of time (minutes usually, an hour at most) so it’s not in real-time. Also we don’t store historical
+        data, so once the cache is refreshed the previous content is automatically discarded.</p>
+    </div>
+  </section>
 
-    <section class="section" id="privacy">
-      <div class="content">
-        <h2>
-          <a href="#privacy">Privacy policy</a>
-        </h2>
-        <p>Your privacy is important to us. It is Parrots's policy to respect your privacy regarding any information we may collect from you across our website, <a href="https://parrot.crz.li">https://parrot.crz.li</a>, and other sites we own and operate.</p>
-        <p>We only ask for personal information when we truly need it to provide a service to you. We collect it by fair and lawful means, with your knowledge and consent. We also let you know why we’re collecting it and how it will be used.</p>
-        <p>We only retain collected information for as long as necessary to provide you with your requested service. What data we store, we’ll protect within commercially acceptable means to prevent loss and theft, as well as unauthorised access, disclosure, copying, use or modification.</p>
-        <p>We don’t share any personally identifying information publicly or with third-parties, except when required to by law.</p>
-        <p>Our website may link to external sites that are not operated by us. Please be aware that we have no control over the content and practices of these sites, and cannot accept responsibility or liability for their respective privacy policies.</p>
-        <p>You are free to refuse our request for your personal information, with the understanding that we may be unable to provide you with some of your desired services.</p>
-        <p>Your continued use of our website will be regarded as acceptance of our practices around privacy and personal information. If you have any questions about how we handle user data and personal information, feel free to contact us.</p>
-        <p>This policy is effective as of 25 September 2018.</p>
-      </div>
-    </section>
+  <section class="section" id="privacy">
+    <div class="content">
+      <h2>
+        <a href="#privacy">Privacy policy</a>
+      </h2>
+      <p>Your privacy is important to us. It is Parrots's policy to respect your privacy regarding any information we
+        may collect from you across our website, <a href="https://parrot.crz.li">https://parrot.crz.li</a>, and other
+        sites we own and operate.</p>
+      <p>We only ask for personal information when we truly need it to provide a service to you. We collect it by fair
+        and lawful means, with your knowledge and consent. We also let you know why we’re collecting it and how it will
+        be used.</p>
+      <p>We only retain collected information for as long as necessary to provide you with your requested service. What
+        data we store, we’ll protect within commercially acceptable means to prevent loss and theft, as well as
+        unauthorised access, disclosure, copying, use or modification.</p>
+      <p>We don’t share any personally identifying information publicly or with third-parties, except when required to
+        by law.</p>
+      <p>Our website may link to external sites that are not operated by us. Please be aware that we have no control
+        over the content and practices of these sites, and cannot accept responsibility or liability for their
+        respective privacy policies.</p>
+      <p>You are free to refuse our request for your personal information, with the understanding that we may be unable
+        to provide you with some of your desired services.</p>
+      <p>Your continued use of our website will be regarded as acceptance of our practices around privacy and personal
+        information. If you have any questions about how we handle user data and personal information, feel free to
+        contact us.</p>
+      <p>This policy is effective as of 25 September 2018.</p>
+    </div>
+  </section>
 
-    <section class="section" id="terms">
-      <div class="content">
-        <h2>
-          <a href="#terms">Terms of service</a>
-        </h2>
-        <h3>1. Terms</h3>
-        <p>By accessing the website at <a href="https://parrot.crz.li">https://parrot.crz.li</a>, you are agreeing to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws. If you do not agree with any of these terms, you are prohibited from using or accessing this site. The materials contained in this website are protected by applicable copyright and trademark law.</p>
-        <h3>2. Use License</h3>
-        <ol type="a">
-          <li>
-            Permission is granted to temporarily download one copy of the materials (information or software) on Parrot's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
-            <ol type="i">
-              <li>modify or copy the materials;</li>
-              <li>use the materials for any commercial purpose, or for any public display (commercial or non-commercial);</li>
-              <li>attempt to decompile or reverse engineer any software contained on Parrot's website;</li>
-              <li>remove any copyright or other proprietary notations from the materials; or</li>
-              <li>transfer the materials to another person or "mirror" the materials on any other server.</li>
-            </ol>
-          </li>
-          <li>This license shall automatically terminate if you violate any of these restrictions and may be terminated by Parrot at any time. Upon terminating your viewing of these materials or upon the termination of this license, you must destroy any downloaded materials in your possession whether in electronic or printed format.</li>
-        </ol>
-        <h3>3. Disclaimer</h3>
-        <ol type="a">
-          <li>The materials on Parrot's website are provided on an 'as is' basis. Parrot makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</li>
-          <li>Further, Parrot does not warrant or make any representations concerning the accuracy, likely results, or reliability of the use of the materials on its website or otherwise relating to such materials or on any sites linked to this site.</li>
-        </ol>
-        <h3>4. Limitations</h3>
-        <p>In no event shall Parrot or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Parrot's website, even if Parrot or a Parrot authorized representative has been notified orally or in writing of the possibility of such damage. Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.</p>
-        <h3>5. Accuracy of materials</h3>
-        <p>The materials appearing on Parrot's website could include technical, typographical, or photographic errors. Parrot does not warrant that any of the materials on its website are accurate, complete or current. Parrot may make changes to the materials contained on its website at any time without notice. However Parrot does not make any commitment to update the materials.</p>
-        <h3>6. Links</h3>
-        <p>Parrot has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Parrot of the site. Use of any such linked website is at the user's own risk.</p>
-        <h3>7. Modifications</h3>
-        <p>Parrot may revise these terms of service for its website at any time without notice. By using this website you are agreeing to be bound by the then current version of these terms of service.</p>
-        <h3>8. Governing Law</h3>
-        <p>These terms and conditions are governed by and construed in accordance with the laws of Brazil and you irrevocably submit to the exclusive jurisdiction of the courts in that State or location.</p>
-      </div>
-    </section>
+  <section class="section" id="terms">
+    <div class="content">
+      <h2>
+        <a href="#terms">Terms of service</a>
+      </h2>
+      <h3>1. Terms</h3>
+      <p>By accessing the website at <a href="https://parrot.crz.li">https://parrot.crz.li</a>, you are agreeing to be
+        bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for
+        compliance with any applicable local laws. If you do not agree with any of these terms, you are prohibited from
+        using or accessing this site. The materials contained in this website are protected by applicable copyright and
+        trademark law.</p>
+      <h3>2. Use License</h3>
+      <ol type="a">
+        <li>
+          Permission is granted to temporarily download one copy of the materials (information or software) on Parrot's
+          website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer
+          of title, and under this license you may not:
+          <ol type="i">
+            <li>modify or copy the materials;</li>
+            <li>use the materials for any commercial purpose, or for any public display (commercial or non-commercial);</li>
+            <li>attempt to decompile or reverse engineer any software contained on Parrot's website;</li>
+            <li>remove any copyright or other proprietary notations from the materials; or</li>
+            <li>transfer the materials to another person or "mirror" the materials on any other server.</li>
+          </ol>
+        </li>
+        <li>This license shall automatically terminate if you violate any of these restrictions and may be terminated
+          by Parrot at any time. Upon terminating your viewing of these materials or upon the termination of this
+          license, you must destroy any downloaded materials in your possession whether in electronic or printed
+          format.</li>
+      </ol>
+      <h3>3. Disclaimer</h3>
+      <ol type="a">
+        <li>The materials on Parrot's website are provided on an 'as is' basis. Parrot makes no warranties, expressed
+          or implied, and hereby disclaims and negates all other warranties including, without limitation, implied
+          warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of
+          intellectual property or other violation of rights.</li>
+        <li>Further, Parrot does not warrant or make any representations concerning the accuracy, likely results, or
+          reliability of the use of the materials on its website or otherwise relating to such materials or on any
+          sites linked to this site.</li>
+      </ol>
+      <h3>4. Limitations</h3>
+      <p>In no event shall Parrot or its suppliers be liable for any damages (including, without limitation, damages
+        for loss of data or profit, or due to business interruption) arising out of the use or inability to use the
+        materials on Parrot's website, even if Parrot or a Parrot authorized representative has been notified orally or
+        in writing of the possibility of such damage. Because some jurisdictions do not allow limitations on implied
+        warranties, or limitations of liability for consequential or incidental damages, these limitations may not
+        apply to you.</p>
+      <h3>5. Accuracy of materials</h3>
+      <p>The materials appearing on Parrot's website could include technical, typographical, or photographic errors.
+        Parrot does not warrant that any of the materials on its website are accurate, complete or current. Parrot may
+        make changes to the materials contained on its website at any time without notice. However Parrot does not make
+        any commitment to update the materials.</p>
+      <h3>6. Links</h3>
+      <p>Parrot has not reviewed all of the sites linked to its website and is not responsible for the contents of any
+        such linked site. The inclusion of any link does not imply endorsement by Parrot of the site. Use of any such
+        linked website is at the user's own risk.</p>
+      <h3>7. Modifications</h3>
+      <p>Parrot may revise these terms of service for its website at any time without notice. By using this website you
+        are agreeing to be bound by the then current version of these terms of service.</p>
+      <h3>8. Governing Law</h3>
+      <p>These terms and conditions are governed by and construed in accordance with the laws of Brazil and you
+        irrevocably submit to the exclusive jurisdiction of the courts in that State or location.</p>
+    </div>
+  </section>
 
-    <footer class="footer">
-      <div class="content">
-        <p class="copyright">© 2018 Corenzan &middot; <a href="/#docs">Documentation</a> &middot; <a href="/#faq">FAQ</a> &middot; <a href="/#privacy">Privacy policy</a> &middot; <a href="/#terms">Terms of service</a> &middot; <a href="mailto:help@corenzan.com">Contact</a></p>
-      </div>
-    </footer>
-  </body>
+  <footer class="footer">
+    <div class="content">
+      <p>© 2018 Corenzan &middot; <a href="/#">Parrot</a> &middot; <a href="/#docs">Documentation</a> &middot; <a href="/#faq">FAQ</a>
+        &middot; <a href="/#privacy">Privacy
+          policy</a> &middot; <a href="/#terms">Terms of service</a> &middot; <a href="mailto:help@corenzan.com">Contact</a></p>
+    </div>
+  </footer>
+</body>
+
 </html>

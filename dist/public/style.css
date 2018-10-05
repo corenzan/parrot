@@ -1,3 +1,11 @@
+:root {
+  --ice-water: hsl(139, 78%, 86%);
+  --orinoco: hsl(87, 87%, 93%);
+  --logan: hsl(241, 21%, 83%);
+  --mulled-wine: hsl(241, 36%, 65%);
+  --black-currant: hsl(241, 21%, 21%);
+}
+
 html {
   font-size: 16px;
 }
@@ -9,11 +17,12 @@ html {
 }
 
 body {
-  color: hsl(138, 38%, 12%);
-  font-family: Zilla Slab, monospace;
+  color: hsl(241, 21%, 21%);
+  font-family: IBM Plex Sans, sans-serif;
 }
 
 code {
+  font-family: IBM Plex Mono, monospace;
   font-size: 0.875em;
 }
 
@@ -22,28 +31,23 @@ code {
 /* - */
 
 .content {
-  margin: 5% auto;
-  max-width: 45rem;
-}
-
-.splash,
-.footer,
-.section {
-  padding: 3rem 1.5rem;
+  margin: 1.5rem auto;
+  max-width: 48rem;
 }
 
 .section {
   -webkit-clip-path: polygon(
-    0 1.5rem,
+    0 0.75rem,
     100% 0,
-    100% calc(100% - 1.5rem),
+    100% calc(100% - 0.75rem),
     0 100%
   );
-  clip-path: polygon(0 1.5rem, 100% 0, 100% calc(100% - 1.5rem), 0 100%);
+  clip-path: polygon(0 0.75rem, 100% 0, 100% calc(100% - 0.75rem), 0 100%);
+  padding: 5% 1.5rem;
 }
 
 .section:nth-child(2n + 1) {
-  background-color: whitesmoke;
+  background-color: hsl(87, 87%, 93%);
 }
 
 /* - */
@@ -51,10 +55,11 @@ code {
 /* - */
 
 .splash {
-  background: ivory url(/pentagon.png);
-  -webkit-clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.5rem), 0 100%);
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 1.5rem), 0 100%);
+  background: hsl(87, 87%, 93%) url(/pentagon.png);
+  -webkit-clip-path: polygon(0 0, 100% 0, 100% calc(100% - 0.75rem), 0 100%);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 0.75rem), 0 100%);
   text-align: center;
+  padding: 5% 1.5rem;
 }
 
 .splash h1 {
@@ -69,7 +74,7 @@ code {
 
 .splash h1 + p {
   font-size: 1.5em;
-  margin: 2.25rem 0 1.5rem;
+  margin: 5% 0 0.75rem;
 }
 
 /* - */
@@ -77,13 +82,13 @@ code {
 /* - */
 
 .code code {
-  background-color: hsla(138, 78%, 96%, 0.5);
+  background-color: hsla(87, 87%, 93%, 0.5);
   display: inline-block;
   padding: 1.5em 2.125em;
 }
 
 .code .verb {
-  color: hsl(138, 78%, 46%);
+  color: hsl(270, 30%, 15%);
 }
 
 .code .url {
@@ -149,6 +154,7 @@ table {
 th,
 td {
   border: 1px solid gainsboro;
+  line-height: 1.25;
   padding: 0.5rem 0.75rem;
 }
 
@@ -157,14 +163,25 @@ td {
 /* - */
 
 .footer {
+  background-color: hsl(241, 21%, 21%);
+  bottom: 0;
+  color: hsl(241, 21%, 83%);
+  position: sticky;
+  padding: 1.5rem;
   text-align: center;
 }
 
+@media (min-width: 375px) {
+  .footer {
+    padding: 3rem;
+  }
+}
+
 .footer .content {
-  margin: 3% auto;
+  margin: 0 auto;
 }
 
 .footer a {
-  color: hsl(138, 78%, 26%);
+  color: hsl(241, 36%, 65%);
   text-decoration: underline;
 }
