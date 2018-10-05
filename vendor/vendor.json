@@ -18,6 +18,6 @@
   "rootPath": "github.com/corenzan/parrot",
   "heroku": {
     "goVersion": "go1.10",
-    "install": "."
+    "install": ["./..."]
   }
 }
