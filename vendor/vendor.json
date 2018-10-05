@@ -1,19 +1,22 @@
 {
-	"comment": "",
-	"ignore": "test",
-	"package": [
-		{
-			"checksumSHA1": "W8mzTLRjnooGtHwWaxSX8eq8hlY=",
-			"path": "github.com/patrickmn/go-cache",
-			"revision": "5633e0862627c011927fa39556acae8b1f1df58a",
-			"revisionTime": "2018-08-15T05:31:27Z"
-		},
-		{
-			"checksumSHA1": "fIF08cg4vdAdHRxF6rbSrKVDi4A=",
-			"path": "mvdan.cc/xurls",
-			"revision": "70405f5eab516c9f7b626d803b043415809499a6",
-			"revisionTime": "2018-09-01T19:03:42Z"
-		}
-	],
-	"rootPath": "github.com/corenzan/parrot"
+  "comment": "",
+  "ignore": "test",
+  "package": [
+    {
+      "checksumSHA1": "W8mzTLRjnooGtHwWaxSX8eq8hlY=",
+      "path": "github.com/patrickmn/go-cache",
+      "revision": "5633e0862627c011927fa39556acae8b1f1df58a",
+      "revisionTime": "2018-08-15T05:31:27Z"
+    },
+    {
+      "checksumSHA1": "fIF08cg4vdAdHRxF6rbSrKVDi4A=",
+      "path": "mvdan.cc/xurls",
+      "revision": "70405f5eab516c9f7b626d803b043415809499a6",
+      "revisionTime": "2018-09-01T19:03:42Z"
+    }
+  ],
+  "rootPath": "github.com/corenzan/parrot",
+  "heroku": {
+    "goVersion": "go1.11"
+  }
 }
