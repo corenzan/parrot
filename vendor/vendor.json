@@ -17,6 +17,6 @@
   ],
   "rootPath": "github.com/corenzan/parrot",
   "heroku": {
-    "goVersion": "go1.11"
+    "goVersion": "go1.11.1"
   }
 }
