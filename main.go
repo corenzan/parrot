@@ -1,81 +1,87 @@
 package main
 
 import (
+	"context"
+	"flag"
 	"fmt"
-	"github.com/corenzan/parrot/twitter"
-	"github.com/patrickmn/go-cache"
 	"log"
-	"mvdan.cc/xurls"
 	"net/http"
-	"net/url"
 	"os"
-	"regexp"
+	"os/signal"
+	"path"
 	"time"
+
+	"github.com/corenzan/parrot/twitter"
 )
 
 var (
-	routeRegexp = regexp.MustCompile(`^/(\w+)(|\.txt|\.html|\.json)$`)
-	urlRegexp   = xurls.Relaxed()
+	logger *log.Logger
+	addr   string
+	static http.Handler
 )
 
-type Parrot struct {
-	twitter *twitter.Client
-	cache   *cache.Cache
-}
+func handler(w http.ResponseWriter, r *http.Request) {
+	requestID := r.Header.Get("X-Request-Id")
+	if requestID == "" {
+		requestID = fmt.Sprintf("%d", time.Now().UnixNano())
+	}
 
-func autoLink(text string) string {
-	return urlRegexp.ReplaceAllStringFunc(text, func(src string) string {
-		URL, err := url.Parse(src)
-		if err != nil {
-			return src
-		}
-		if URL.Scheme == "" {
-			URL.Scheme = "http"
-		}
-		return `<a href="` + URL.String() + `">` + src + `</a>`
-	})
-}
+	logger.Println(requestID, r.Method, r.URL.Path, r.RemoteAddr, r.UserAgent())
 
-func (p *Parrot) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	parts := routeRegexp.FindSubmatch([]byte(r.URL.Path))
-	if parts == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	username, format := parts[1], parts[2]
-	var status *twitter.Status
-	cached, found := p.cache.Get(string(username))
-	if found {
-		status = cached.(*twitter.Status)
-	} else {
-		status = p.twitter.LastStatus(string(username))
-		p.cache.Set(string(username), status, cache.DefaultExpiration)
-	}
-	if status == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	switch string(format) {
-	case "", ".html":
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprint(w, autoLink(status.Text))
-	case ".txt":
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprint(w, status.Text)
-	case ".json":
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		fmt.Fprint(w, `{"status":"`+status.Text+`"}`)
+	w.Header().Set("X-Request-Id", requestID)
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+
+	switch path.Dir(r.URL.Path) {
+	case "/twitter":
+		twitter.ServeHTTP(w, r)
+	default:
+		static.ServeHTTP(w, r)
 	}
 }
 
 func main() {
-	key := os.Getenv("TWITTER_KEY")
-	secret := os.Getenv("TWITTER_SECRET")
-	parrot := &Parrot{
-		twitter.New(key, secret),
-		cache.New(time.Hour, time.Hour),
+	flag.StringVar(&addr, "addr", ":8080", "Server bound address")
+	flag.Parse()
+
+	logger = log.New(os.Stdout, "http: ", log.LstdFlags)
+
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
 	}
-	http.Handle("/", parrot)
-	port := os.Getenv("PORT")
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	static = http.FileServer(http.Dir(path.Join(path.Dir(ex), "public")))
+
+	server := &http.Server{
+		Addr:         addr,
+		Handler:      http.HandlerFunc(handler),
+		ErrorLog:     logger,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  15 * time.Second,
+	}
+
+	wait := make(chan bool)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+
+	go func() {
+		<-quit
+		logger.Println("Server is shutting down...")
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+		defer cancel()
+
+		server.SetKeepAlivesEnabled(false)
+		if err := server.Shutdown(ctx); err != nil {
+			logger.Fatalf("Could not shutdown the server: %v\n", err)
+		}
+		close(wait)
+	}()
+
+	logger.Println("Server is listening on", addr)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		logger.Fatalf("Could not listen on %s: %v\n", addr, err)
+	}
+
+	<-wait
 }
