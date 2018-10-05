@@ -1,5 +1,5 @@
 default: fmt vet
-	@go build -o dist/parrot .
+	@go build -o parrot .
 fmt:
 	@go fmt ./...
 vet:
