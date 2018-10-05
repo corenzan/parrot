@@ -45,11 +45,7 @@ func main() {
 
 	logger = log.New(os.Stdout, "http: ", log.LstdFlags)
 
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	static = http.FileServer(http.Dir(path.Join(path.Dir(ex), "public")))
+	static = http.FileServer(http.Dir("public"))
 
 	server := &http.Server{
 		Addr:         addr,
