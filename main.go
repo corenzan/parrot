@@ -8,6 +8,7 @@ import (
 	"github.com/corenzan/parrot/twitter"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 )
 
 var (
@@ -25,6 +26,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(1 * time.Second))
+	r.Use(cors.New(cors.Options{}).Handler)
 
 	r.Get("/twitter/{name}", func(w http.ResponseWriter, r *http.Request) {
 		twitter.ServeHTTP(w, r)
