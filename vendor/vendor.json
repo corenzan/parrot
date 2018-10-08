@@ -1,23 +1,49 @@
 {
-  "comment": "",
-  "ignore": "test",
-  "package": [
-    {
-      "checksumSHA1": "W8mzTLRjnooGtHwWaxSX8eq8hlY=",
-      "path": "github.com/patrickmn/go-cache",
-      "revision": "5633e0862627c011927fa39556acae8b1f1df58a",
-      "revisionTime": "2018-08-15T05:31:27Z"
-    },
-    {
-      "checksumSHA1": "fIF08cg4vdAdHRxF6rbSrKVDi4A=",
-      "path": "mvdan.cc/xurls",
-      "revision": "70405f5eab516c9f7b626d803b043415809499a6",
-      "revisionTime": "2018-09-01T19:03:42Z"
-    }
-  ],
-  "rootPath": "github.com/corenzan/parrot",
-  "heroku": {
-    "goVersion": "go1.10",
-    "install": ["./..."]
-  }
+	"comment": "",
+	"heroku": {
+		"goVersion": "go1.10",
+		"install": [
+			"./..."
+		]
+	},
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "qvcjITJevHwdtAOx3updiV3nbPo=",
+			"path": "github.com/corenzan/parrot",
+			"revision": "b86ed4c1e8509ff5f80d44d995a4adb50cf3a2d5",
+			"revisionTime": "2018-10-08T22:17:46Z"
+		},
+		{
+			"checksumSHA1": "eKCjCFTfnx5byuLfbOVLjs3aFUY=",
+			"path": "github.com/corenzan/parrot/helpers",
+			"revision": "b86ed4c1e8509ff5f80d44d995a4adb50cf3a2d5",
+			"revisionTime": "2018-10-08T22:17:46Z"
+		},
+		{
+			"checksumSHA1": "Jv9sInODU9gdmlEZdSOfEsnW/2Y=",
+			"path": "github.com/corenzan/parrot/twitter",
+			"revision": "b86ed4c1e8509ff5f80d44d995a4adb50cf3a2d5",
+			"revisionTime": "2018-10-08T22:17:46Z"
+		},
+		{
+			"checksumSHA1": "n9ry/OHiteTTjZOeJHTrEwRSnms=",
+			"path": "github.com/go-chi/cors",
+			"revision": "07727c846d14299758e54a275dd8c81353c01960",
+			"revisionTime": "2018-08-16T15:23:45Z"
+		},
+		{
+			"checksumSHA1": "W8mzTLRjnooGtHwWaxSX8eq8hlY=",
+			"path": "github.com/patrickmn/go-cache",
+			"revision": "5633e0862627c011927fa39556acae8b1f1df58a",
+			"revisionTime": "2018-08-15T05:31:27Z"
+		},
+		{
+			"checksumSHA1": "fIF08cg4vdAdHRxF6rbSrKVDi4A=",
+			"path": "mvdan.cc/xurls",
+			"revision": "70405f5eab516c9f7b626d803b043415809499a6",
+			"revisionTime": "2018-09-01T19:03:42Z"
+		}
+	],
+	"rootPath": "github.com/corenzan/parrot"
 }
