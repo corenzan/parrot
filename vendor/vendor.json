@@ -27,6 +27,18 @@
 			"revisionTime": "2018-10-08T22:17:46Z"
 		},
 		{
+			"checksumSHA1": "s6RbQQsB4b/zT2KcjgpjAYeFm+g=",
+			"path": "github.com/go-chi/chi",
+			"revision": "235fa5d9ba51003bd4c40a69bb9e7c4d82a5ef39",
+			"revisionTime": "2018-09-11T21:14:25Z"
+		},
+		{
+			"checksumSHA1": "GbWH2xKdjpLqjlZOmq8u/ffDCFM=",
+			"path": "github.com/go-chi/chi/middleware",
+			"revision": "235fa5d9ba51003bd4c40a69bb9e7c4d82a5ef39",
+			"revisionTime": "2018-09-11T21:14:25Z"
+		},
+		{
 			"checksumSHA1": "n9ry/OHiteTTjZOeJHTrEwRSnms=",
 			"path": "github.com/go-chi/cors",
 			"revision": "07727c846d14299758e54a275dd8c81353c01960",
