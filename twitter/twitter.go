@@ -49,9 +49,9 @@ func (t Timeline) HTML() string {
 		s = strings.Replace(s, "#"+h.Text, lnk, 1)
 	}
 
-	for _, u := range t[0].Entities.URLs {
-		lnk := `<a href="` + u.ExpandedURL + `">` + u.DisplayURL + `</a>`
-		s = strings.Replace(s, u.URL, lnk, 1)
+	for _, um := range t[0].Entities.UserMentions {
+		lnk := `<a href="https://twitter.com/` + um.ScreenName + `">@` + um.ScreenName + `</a>`
+		s = strings.Replace(s, "@"+um.ScreenName, lnk, 1)
 	}
 
 	for _, u := range t[0].Entities.URLs {
