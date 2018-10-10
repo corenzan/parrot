@@ -22,19 +22,56 @@ const (
 	endpoint = "https://api.twitter.com"
 )
 
-// Activity ...
-type Activity struct {
-	Status string `json:"status"`
+// Timeline ...
+type Timeline []struct {
+	Text     string `json:"text"`
+	Entities struct {
+		Hashtags []struct {
+			Text string `json:"text"`
+		} `json:"hashtags"`
+		UserMentions []struct {
+			ScreenName string `json:"screen_name"`
+		} `json:"user_mentions"`
+		URLs []struct {
+			ExpandedURL string `json:"expanded_url"`
+			DisplayURL  string `json:"display_url"`
+			URL         string `json:"url"`
+		} `json:"urls"`
+	} `json:"entities"`
 }
 
 // HTML ...
-func (a *Activity) HTML() string {
-	return a.Status
+func (t Timeline) HTML() string {
+	s := t.String()
+
+	for _, h := range t[0].Entities.Hashtags {
+		lnk := `<a href="https://twitter.com/hashtag/` + h.Text + `">#` + h.Text + `</a>`
+		s = strings.Replace(s, "#"+h.Text, lnk, 1)
+	}
+
+	for _, u := range t[0].Entities.URLs {
+		lnk := `<a href="` + u.ExpandedURL + `">` + u.DisplayURL + `</a>`
+		s = strings.Replace(s, u.URL, lnk, 1)
+	}
+
+	for _, u := range t[0].Entities.URLs {
+		lnk := `<a href="` + u.ExpandedURL + `">` + u.DisplayURL + `</a>`
+		s = strings.Replace(s, u.URL, lnk, 1)
+	}
+
+	return s
+}
+
+// JSON ...
+func (t Timeline) JSON() map[string]string {
+	return map[string]string{
+		"status": t.String(),
+	}
 }
 
 // Text ...
-func (a *Activity) Text() string {
-	return a.Status
+func (t Timeline) String() string {
+	return t[0].Text
 }
 
 // Client ...
@@ -95,19 +132,11 @@ func (c *Client) AccessToken() (string, error) {
 	return token["access_token"], nil
 }
 
-// Twit ...
-type Twit struct {
-	Text string `json:"text"`
-}
-
-// Timeline ...
-type Timeline []Twit
-
 // LatestActivity ...
-func (c *Client) LatestActivity(username string) (*Activity, error) {
-	var activity *Activity
+func (c *Client) LatestActivity(username string) (Timeline, error) {
+	var timeline Timeline
 	if value, ok := c.cache.Get(username); ok {
-		activity = value.(*Activity)
+		timeline = value.(Timeline)
 	} else {
 		req, err := c.NewRequest("GET", "/1.1/statuses/user_timeline.json?count=1&screen_name="+username, nil)
 		if err != nil {
@@ -125,17 +154,13 @@ func (c *Client) LatestActivity(username string) (*Activity, error) {
 		if resp.StatusCode != http.StatusOK {
 			return nil, errors.New(resp.Status)
 		}
-		timeline := Timeline{}
 		err = json.NewDecoder(resp.Body).Decode(&timeline)
 		if err != nil {
 			return nil, err
 		}
-		activity = &Activity{
-			Status: timeline[0].Text,
-		}
-		c.cache.Set(username, activity, cache.DefaultExpiration)
+		c.cache.Set(username, timeline, cache.DefaultExpiration)
 	}
-	return activity, nil
+	return timeline, nil
 }
 
 var (
@@ -159,7 +184,7 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	activity, err := client.LatestActivity(username)
+	twit, err := client.LatestActivity(username)
 	if err != nil {
 		panic(err)
 	}
@@ -167,16 +192,16 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch ext {
 	case ".html", "":
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprint(w, activity.HTML())
+		fmt.Fprint(w, twit.HTML())
 	case ".json":
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		err := json.NewEncoder(w).Encode(activity)
+		err := json.NewEncoder(w).Encode(twit.JSON())
 		if err != nil {
 			panic(err)
 		}
 	case ".txt":
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprint(w, activity.Text())
+		fmt.Fprint(w, twit.String())
 	default:
 		w.WriteHeader(http.StatusNotAcceptable)
 	}
