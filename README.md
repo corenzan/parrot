@@ -1,35 +1,21 @@
 # Parrot
 
-> Fetch someone's last tweet, hassle free.
+> Latest social media activity hassle free.
 
-## Usage
+## About
 
-Make a `GET` request to `https://parrot.corenzan.com/` followed by someone's username on Twitter, optionally suffixed with the desired format - currently supported `html` (default), `txt`, and `json`. Also, please note:
+See https://parrot.crz.li.
 
-- Responses are cached for 1 hour.
-- The HTML format provide anchors for URLs found in the tweet.
+## Development
 
-### Examples
+You'll need `go1.10+` installed, then run `$ make`.
 
-```
-GET https://parrot.corenzan.com/haggen
+You'll also need API credentials as environment variables for it to work.
 
-Javascript : The Curious Case of Null >= 0 – Camp Vanilla <a href="https://t.co/K0LrdKswKu">https://t.co/K0LrdKswKu</a>
-```
-
-```
-GET https://parrot.corenzan.com/haggen.txt
-
-Javascript : The Curious Case of Null >= 0 – Camp Vanilla https://t.co/K0LrdKswKu
-```
-
-```
-GET https://parrot.corenzan.com/haggen.json
-
-{
- "status": "Javascript : The Curious Case of Null &gt;= 0 – Camp Vanilla https://t.co/K0LrdKswKu"
-}
-```
+- `TWITTER_KEY`
+- `TWITTER_SECRET`
+- `INSTAGRAM_KEY`
+- `INSTAGRAM_SECRET`
 
 ## License
 
