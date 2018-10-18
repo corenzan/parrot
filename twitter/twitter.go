@@ -179,23 +179,23 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	twit, err := client.LatestActivity(username)
+	activity, err := client.LatestActivity(username)
 	if err != nil {
 		panic(err)
 	}
 	switch ext {
 	case ".html", "":
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprint(w, twit.HTML())
+		fmt.Fprint(w, activity.HTML())
 	case ".json":
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		err := json.NewEncoder(w).Encode(twit.JSON())
+		err := json.NewEncoder(w).Encode(activity.JSON())
 		if err != nil {
 			panic(err)
 		}
 	case ".txt":
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprint(w, twit.String())
+		fmt.Fprint(w, activity.String())
 	default:
 		w.WriteHeader(http.StatusNotAcceptable)
 	}
