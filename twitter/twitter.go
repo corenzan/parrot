@@ -175,7 +175,7 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	basename := path.Base(r.URL.Path)
 	ext := path.Ext(basename)
 	username := strings.TrimSuffix(basename, ext)
-	if username == "" {
+	if username == "twitter" {
 		http.NotFound(w, r)
 		return
 	}
