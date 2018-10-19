@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
-	"os"
 	"path"
 	"strings"
 	"time"
@@ -22,7 +20,8 @@ const (
 )
 
 var (
-	errorMissingAccessToken = errors.New("Unauthenticated")
+	errorMissingAccessToken = errors.New("Missing Access Token")
+	errorEmpty              = errors.New("Empty")
 )
 
 // Activity ...
@@ -31,6 +30,9 @@ type Activity struct {
 		ErrorType string `json:"error_type"`
 	} `json:"meta"`
 	Data []struct {
+		User struct {
+			Username string `json:"username"`
+		} `json:"user"`
 		Link   string `json:"link"`
 		Images struct {
 			StandardResolution struct {
@@ -81,21 +83,16 @@ func (a *Activity) JSON() []map[string]string {
 
 // Client ...
 type Client struct {
-	id     string
-	secret string
-	cache  struct {
+	cache struct {
 		activity *cache.Cache
 		token    *cache.Cache
 	}
 	http *http.Client
-	url  string
 }
 
 // New ...
-func New(id, secret string) *Client {
+func New() *Client {
 	c := &Client{
-		id:     id,
-		secret: secret,
 		http: &http.Client{
 			Timeout: time.Second * 2,
 		},
@@ -103,15 +100,6 @@ func New(id, secret string) *Client {
 	c.cache.token = cache.New(cache.NoExpiration, cache.NoExpiration)
 	c.cache.activity = cache.New(1*time.Hour, 1*time.Hour)
 	return c
-}
-
-// SetURL ...
-func (c *Client) SetURL(r *http.Request) {
-	scheme := "http"
-	if r.TLS != nil {
-		scheme = "https"
-	}
-	c.url = scheme + "://" + r.Host
 }
 
 // NewRequest ...
@@ -128,54 +116,32 @@ func (c *Client) NewRequest(method, path string, body io.Reader) (*http.Request,
 	return req, nil
 }
 
-// RedirectURL ...
-func (c *Client) RedirectURL(ext string) string {
-	return c.url + "/instagram/?ext=" + ext
-}
-
-// AuthenticationEndpoint ...
-func (c *Client) AuthenticationEndpoint(ext string) string {
-	u := url.QueryEscape(c.RedirectURL(ext))
-	return endpoint + "/oauth/authorize/?client_id=" + c.id + "&redirect_uri=" + u + "&response_type=code"
-}
-
-// AccessTokenResponse ...
-type AccessTokenResponse struct {
-	AccessToken string `json:"access_token"`
-	User        struct {
-		Name string `json:"username"`
-	} `json:"user"`
-}
-
 // SaveAccessToken ...
-func (c *Client) SaveAccessToken(code, ext string) (string, error) {
-	payload := url.Values{}
-	payload.Set("client_id", c.id)
-	payload.Set("client_secret", c.secret)
-	payload.Set("grant_type", "authorization_code")
-	payload.Set("redirect_uri", c.RedirectURL(ext))
-	payload.Set("code", code)
-	req, err := c.NewRequest("POST", "/oauth/access_token", strings.NewReader(payload.Encode()))
+func (c *Client) SaveAccessToken(token string) (string, error) {
+	req, err := c.NewRequest("GET", "/v1/users/self/media/recent/?count=5&access_token="+token, nil)
 	if err != nil {
 		return "", err
 	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=utf-8")
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		dump, _ := httputil.DumpResponse(resp, true)
-		return "", errors.New(string(dump))
+		return "", errors.New(resp.Status)
 	}
-	atr := &AccessTokenResponse{}
-	err = json.NewDecoder(resp.Body).Decode(atr)
+	var activity *Activity
+	err = json.NewDecoder(resp.Body).Decode(&activity)
 	if err != nil {
 		return "", err
 	}
-	c.cache.token.Set(atr.User.Name, atr.AccessToken, cache.DefaultExpiration)
-	return atr.User.Name, nil
+	if len(activity.Data) == 0 {
+		return "", errorEmpty
+	}
+	username := activity.Data[0].User.Username
+	c.cache.token.Set(username, token, cache.DefaultExpiration)
+	c.cache.activity.Set(username, activity, cache.DefaultExpiration)
+	return username, nil
 }
 
 // LatestActivity ...
@@ -200,10 +166,9 @@ func (c *Client) LatestActivity(username string) (*Activity, error) {
 		}
 		defer resp.Body.Close()
 		if resp.StatusCode != http.StatusOK {
-			dump, _ := httputil.DumpResponse(resp, true)
-			return nil, errors.New(string(dump))
+			return nil, errors.New(resp.Status)
 		}
-		err = json.NewDecoder(resp.Body).Decode(&activity)
+		err = json.NewDecoder(resp.Body).Decode(activity)
 		if err != nil {
 			return nil, err
 		}
@@ -217,42 +182,35 @@ var (
 )
 
 func init() {
-	id := os.Getenv("INSTAGRAM_ID")
-	secret := os.Getenv("INSTAGRAM_SECRET")
-	client = New(id, secret)
+	client = New()
 }
 
 // ServeHTTP ...
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.FormValue("error") == "access_denied" {
-		http.Error(w, r.FormValue("error_description"), http.StatusUnauthorized)
-		return
-	}
-	client.SetURL(r)
 	basename := path.Base(r.URL.Path)
-	ext := path.Ext(basename)
-	if code := r.FormValue("code"); code != "" {
-		ext = r.FormValue("ext")
-		username, err := client.SaveAccessToken(code, ext)
+	if r.Method == http.MethodPost && basename == "instagram" {
+		username, err := client.SaveAccessToken(r.FormValue("token"))
 		if err != nil {
 			panic(err)
 		}
-		w.Header().Set("Location", client.url+"/instagram/"+username+ext)
+		w.Header().Set("Location", "/instagram/"+username)
 		w.WriteHeader(http.StatusTemporaryRedirect)
 		return
 	}
+	ext := path.Ext(basename)
 	username := strings.TrimSuffix(basename, ext)
-	if username == "" {
+	if username == "instagram" {
 		http.NotFound(w, r)
 		return
 	}
 	activity, err := client.LatestActivity(username)
-	if err == errorMissingAccessToken {
-		w.Header().Set("Location", client.AuthenticationEndpoint(ext))
-		w.WriteHeader(http.StatusTemporaryRedirect)
-		return
-	} else if err != nil {
-		panic(err)
+	if err != nil {
+		if err == errorMissingAccessToken {
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		} else {
+			panic(err)
+		}
 	}
 	switch ext {
 	case ".html", "":

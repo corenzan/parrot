@@ -43,5 +43,9 @@ func main() {
 		}
 	})
 
+	r.Post("/instagram/", func(w http.ResponseWriter, r *http.Request) {
+		instagram.ServeHTTP(w, r)
+	})
+
 	http.ListenAndServe(addr, r)
 }
