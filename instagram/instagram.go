@@ -168,7 +168,7 @@ func (c *Client) LatestActivity(username string) (*Activity, error) {
 		if resp.StatusCode != http.StatusOK {
 			return nil, errors.New(resp.Status)
 		}
-		err = json.NewDecoder(resp.Body).Decode(activity)
+		err = json.NewDecoder(resp.Body).Decode(&activity)
 		if err != nil {
 			return nil, err
 		}
