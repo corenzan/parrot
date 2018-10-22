@@ -118,7 +118,7 @@ func (c *Client) NewRequest(method, path string, body io.Reader) (*http.Request,
 
 // SaveAccessToken ...
 func (c *Client) SaveAccessToken(token string) (string, error) {
-	req, err := c.NewRequest("GET", "/v1/users/self/media/recent/?count=5&access_token="+token, nil)
+	req, err := c.NewRequest("GET", "/v1/users/self/media/recent/?count=9&access_token="+token, nil)
 	if err != nil {
 		return "", err
 	}
@@ -156,7 +156,7 @@ func (c *Client) LatestActivity(username string) (*Activity, error) {
 		} else {
 			return nil, errorMissingAccessToken
 		}
-		req, err := c.NewRequest("GET", "/v1/users/self/media/recent/?count=5&access_token="+token, nil)
+		req, err := c.NewRequest("GET", "/v1/users/self/media/recent/?count=9&access_token="+token, nil)
 		if err != nil {
 			return nil, err
 		}
