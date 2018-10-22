@@ -22,6 +22,7 @@ body {
 }
 
 code {
+  color: hsl(139, 39%, 43%);
   font-family: IBM Plex Mono, monospace;
   font-size: 0.875em;
 }
@@ -66,6 +67,11 @@ code {
   font: 4.5em/1.5 Unlock, cursive;
 }
 
+.splash h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
 @media (min-width: 768px) {
   .splash h1 {
     font-size: 6em;
@@ -82,7 +88,7 @@ code {
 /* - */
 
 .code code {
-  background-color: hsla(87, 87%, 93%, 0.5);
+  background-color: hsla(139, 78%, 86%, 0.125);
   display: inline-block;
   padding: 1.5em 2.125em;
 }
@@ -114,6 +120,10 @@ code {
   font-weight: bolder;
 }
 
+.content h2 a {
+  color: inherit;
+}
+
 .content > * + * {
   margin-top: 1.5rem;
 }
@@ -142,12 +152,21 @@ code {
   list-style: lower-latin;
 }
 
+.content a {
+  color: hsl(139, 78%, 43%);
+}
+
+.content p a {
+  text-decoration: underline;
+}
+
 /* - */
 /* - */
 /* - */
 
 table {
   border: 1px solid gainsboro;
+  font-size: 0.875em;
   width: 100%;
 }
 
