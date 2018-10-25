@@ -2,15 +2,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"log"
 	"net/http"
 	"path"
 	"time"
 
 	"github.com/corenzan/parrot/instagram"
 	"github.com/corenzan/parrot/twitter"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
 )
 
 var (
@@ -23,29 +22,35 @@ func main() {
 
 	fs := http.FileServer(http.Dir("./public"))
 
-	r := chi.NewRouter()
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
 
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.Timeout(time.Second * 1))
-	r.Use(cors.New(cors.Options{}).Handler)
+		if r.Header.Get("Origin") != "" {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+		}
 
-	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
-		switch path.Dir(r.URL.Path) {
-		case "/instagram":
+		id := r.Header.Get("X-Request-Id")
+		if id == "" {
+			id = fmt.Sprint(time.Now().UnixNano())
+		}
+		w.Header().Set("X-Request-Id", id)
+
+		route := r.Method + " " + path.Dir(r.URL.Path)
+		switch route {
+		case "GET /instagram", "POST /instagram":
 			instagram.ServeHTTP(w, r)
-		case "/twitter":
+		case "GET /twitter":
 			twitter.ServeHTTP(w, r)
 		default:
+			if r.Method != http.MethodGet {
+				http.Error(w, "", http.StatusMethodNotAllowed)
+				break
+			}
 			fs.ServeHTTP(w, r)
 		}
-	})
 
-	r.Post("/instagram/", func(w http.ResponseWriter, r *http.Request) {
-		instagram.ServeHTTP(w, r)
+		log.Printf("%s %s %s %s %s", id, r.Method, r.URL.String(), r.RemoteAddr, r.UserAgent())
 	})
-
-	http.ListenAndServe(addr, r)
+	log.Printf("Listening on %s", addr)
+	log.Fatal(http.ListenAndServe(addr, http.DefaultServeMux))
 }
