@@ -8,6 +8,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/corenzan/parrot/flickr"
 	"github.com/corenzan/parrot/instagram"
 	"github.com/corenzan/parrot/twitter"
 )
@@ -41,6 +42,8 @@ func main() {
 			instagram.ServeHTTP(w, r)
 		case "GET /twitter":
 			twitter.ServeHTTP(w, r)
+		case "GET /flickr":
+			flickr.ServeHTTP(w, r)
 		default:
 			if r.Method != http.MethodGet {
 				http.Error(w, "", http.StatusMethodNotAllowed)
