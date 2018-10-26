@@ -24,6 +24,12 @@ func main() {
 	fs := http.FileServer(http.Dir("./public"))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if rec := recover(); rec != nil {
+				http.Error(w, "", http.StatusInternalServerError)
+				log.Printf("Panic: %+v\n", rec)
+			}
+		}()
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 
 		if r.Header.Get("Origin") != "" {
