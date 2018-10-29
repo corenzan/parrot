@@ -64,22 +64,27 @@
             <tr>
               <td>Twitter</td>
               <td><code>twitter</code></td>
-              <td>The content of the latest twit.</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td>Flickr</td>
+              <td><code>flickr</code></td>
+              <td>Uses ID instead of username.</td>
             </tr>
             <tr>
               <td>Instagram</td>
               <td><code>instagram</code></td>
-              <td>The URL of the latest 5 photos. Requires access token.</td>
+              <td>Requires access token.</td>
             </tr>
           </tbody>
         </table>
-        <p>Some platforms may require authentication to work. Such is the case of Instagram which requires the owner of the data to <strong>have an access token beforehand</strong> and then post it as a form field named <code>token</code> to the root URL of the platform. e.g.</p>
+        <p>Some platforms may require an <strong>access token</strong> to work. Such is the case of Instagram which requires the owner of the data to have an access token beforehand and then post it as a form field named <code>token</code> to the root URL of the platform. e.g.</p>
         <p class="code">
           <code>
             POST https://parrot.crz.li/instagram/ token=abc123
           </code>
         </p>
-        <p>Parrot will identify the owner of the token and allow the endpoint with that username to work. e.g. If the owner of the token <code>abc123</code> is <code>johndoe</code> requests to <code>/instagram/johndoe</code> will now be authenticated and work as expected.</p>
+        <p>Parrot will identify the owner of the token and respond with a redirect. Subsequent requests to that username will work as expected. e.g. If the owner of the token <code>abc123</code> is <code>johndoe</code> requests to <code>/instagram/johndoe</code> will now be authenticated.</p>
         <h3>Supported formats</h3>
         <table>
           <thead>
@@ -93,7 +98,7 @@
             <tr>
               <td>HTML</td>
               <td><code>html</code></td>
-              <td>Image URLs as <code>&lt;img&gt;</code> tags; mentions and other URLs as anchors.</td>
+              <td>Images as <code>&lt;img&gt;</code> tags; Links, mentions and other URLs as anchors.</td>
             </tr>
             <tr>
               <td>JSON</td>
@@ -116,13 +121,15 @@
           <a href="#faq">FAQ</a>
         </h2>
         <h3>What is Parrot?</h3>
-        <p>Parrot is a service that fetches your latest activity on social media to have it embedded elsewhere, like on your blog for instance.</p>
+        <p>Parrot is a service to easily fetch your latest activity on social media to have it embedded elsewhere, like on your blog for instance. It's a shortcut through the maze of social APIs.</p>
         <h3>How much does it cost?</h3>
-        <p>Currently Parrot is free of charge. As the product matures we might have to find ways to make it sustainable.</p>
+        <p>For now Parrot is free of charge. As the product matures we might have to find ways to make it sustainable.</p>
         <h3>What platforms does it work with?</h3>
-        <p>Currently Parrot works with Twitter and Instagram. Demand will push integration with more platforms.</p>
+        <p>Parrot currently works with Twitter, Flickr, and Instagram. Demand will push integration with more platforms.</p>
         <h3>What are the limitations?</h3>
-        <p>There are some. Not only because of limitations of the platform itself, but also because of how Parrot was designed. First of all it only works with public data. The content must be cached for a small amount of time (an hour) so it’s not in real-time. Also we don’t store historical data, so once the cache is stale the previous content is automatically discarded.</p>
+        <p>Social platform APIs have their own limitations of what, how much, and how often Parrot can access. Also Parrot is purposefully limited in options to avoid complexity. All content is <strong>cached for one hour</strong>.</p>
+        <h3>Does it retain any data?</h3>
+        <p>There are access and error logs. Access tokens are also kept for an undertermined amount of time. But all content from social platforms is <strong>only kept in memory</strong> and <strong>discarded</strong> when the cache expires or when the process is terminated (e.g. when there are updates or restarts).</p>
       </div>
     </section>
 
