@@ -208,9 +208,8 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err == errorMissingAccessToken {
 			http.Error(w, "", http.StatusUnauthorized)
 			return
-		} else {
-			panic(err)
 		}
+		panic(err)
 	}
 	switch ext {
 	case ".html", "":
