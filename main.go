@@ -11,6 +11,8 @@ import (
 	"github.com/corenzan/parrot/flickr"
 	"github.com/corenzan/parrot/instagram"
 	"github.com/corenzan/parrot/twitter"
+
+	raven "github.com/getsentry/raven-go"
 )
 
 var (
@@ -18,6 +20,8 @@ var (
 )
 
 func main() {
+	raven.SetDSN("")
+
 	flag.StringVar(&addr, "addr", ":8080", "Server bound address")
 	flag.Parse()
 
@@ -25,9 +29,14 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
-			if rec := recover(); rec != nil {
+			if value := recover(); value != nil {
+				err := value.(error)
 				http.Error(w, "", http.StatusInternalServerError)
-				log.Printf("Panic: %+v\n", rec)
+
+				log.Printf("Panic: %+v\n", err)
+
+				raven.SetHttpContext(raven.NewHttp(r))
+				raven.CaptureError(err, nil)
 			}
 		}()
 		w.Header().Set("X-Content-Type-Options", "nosniff")
