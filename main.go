@@ -2,15 +2,16 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"os"
 	"path"
-	"time"
 
 	"github.com/corenzan/parrot/flickr"
 	"github.com/corenzan/parrot/instagram"
 	"github.com/corenzan/parrot/twitter"
+	"github.com/google/uuid"
 
 	raven "github.com/getsentry/raven-go"
 )
@@ -45,11 +46,11 @@ func main() {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 		}
 
-		id := r.Header.Get("X-Request-Id")
-		if id == "" {
-			id = fmt.Sprint(time.Now().UnixNano())
+		rid := r.Header.Get("X-Request-Id")
+		if rid == "" {
+			rid = uuid.New().String()
 		}
-		w.Header().Set("X-Request-Id", id)
+		w.Header().Set("X-Request-Id", rid)
 
 		route := r.Method + " " + path.Dir(r.URL.Path)
 		switch route {
@@ -67,7 +68,21 @@ func main() {
 			fs.ServeHTTP(w, r)
 		}
 
-		log.Printf("%s %s %s %s %s", id, r.Method, r.URL.String(), r.RemoteAddr, r.UserAgent())
+		ga := url.Values{}
+		ga.Set("v", "1")
+		ga.Set("tid", os.Getenv("GOOGLE_ANALYTICS_ID"))
+		ga.Set("ds", "api")
+		ga.Set("cid", rid)
+		ga.Set("uip", r.RemoteAddr)
+		ga.Set("ua", r.UserAgent())
+		ga.Set("dl", r.URL.String())
+		ga.Set("t", "pageview")
+		_, err := http.PostForm("https://www.google-analytics.com/collect", ga)
+		if err != nil {
+			panic(err)
+		}
+
+		log.Printf("%s %s %s %s %s", rid, r.Method, r.URL.String(), r.RemoteAddr, r.UserAgent())
 	})
 	log.Printf("Listening on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, http.DefaultServeMux))
