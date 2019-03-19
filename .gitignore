@@ -4,3 +4,4 @@
 parrot
 vendor/*/
 .gopath
+tmp/
