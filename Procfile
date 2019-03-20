@@ -1,1 +1,1 @@
-web: parrot -addr ":5000"
+web: parrot

@@ -14,12 +14,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/patrickmn/go-cache"
+	"github.com/corenzan/parrot/analytics"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
+	cache "github.com/patrickmn/go-cache"
 )
 
 const (
 	ua       = "Parrot/1.0"
 	endpoint = "https://api.twitter.com"
+)
+
+var (
+	errNotFound = errors.New("Not Found")
 )
 
 // Timeline ...
@@ -147,8 +155,11 @@ func (c *Client) LatestActivity(username string) (Timeline, error) {
 		if err != nil {
 			return nil, err
 		}
+		if resp.StatusCode == http.StatusUnauthorized {
+			return nil, errNotFound
+		}
 		if resp.StatusCode != http.StatusOK {
-			return nil, errors.New(resp.Status)
+			return nil, fmt.Errorf("Unexpected Response: %+v", resp)
 		}
 		err = json.NewDecoder(resp.Body).Decode(&timeline)
 		if err != nil {
@@ -170,33 +181,38 @@ func init() {
 	client = New(key, secret)
 }
 
-// ServeHTTP ...
-func ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	basename := path.Base(r.URL.Path)
-	ext := path.Ext(basename)
-	username := strings.TrimSuffix(basename, ext)
-	if username == "twitter" {
-		http.NotFound(w, r)
-		return
-	}
-	activity, err := client.LatestActivity(username)
-	if err != nil {
-		panic(err)
-	}
-	switch ext {
-	case ".html", "":
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprint(w, activity.HTML())
-	case ".json":
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		err := json.NewEncoder(w).Encode(activity.JSON())
+// Route ...
+func Route(g *echo.Group) {
+	g.Use(middleware.CORS())
+	g.Use(analytics.Middleware())
+
+	g.GET("/", func(c echo.Context) error {
+		c.NoContent(http.StatusBadRequest)
+		return nil
+	})
+
+	g.GET("/:basename", func(c echo.Context) error {
+		basename := c.Param("basename")
+		ext := path.Ext(basename)
+		username := strings.TrimSuffix(basename, ext)
+		activity, err := client.LatestActivity(username)
 		if err != nil {
+			if err == errNotFound {
+				c.NoContent(http.StatusNotFound)
+				return nil
+			}
 			panic(err)
 		}
-	case ".txt":
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprint(w, activity.String())
-	default:
-		w.WriteHeader(http.StatusNotAcceptable)
-	}
+		switch ext {
+		case ".html", "":
+			c.HTML(http.StatusOK, activity.HTML())
+		case ".json":
+			c.JSON(http.StatusOK, activity.JSON())
+		case ".txt":
+			c.String(http.StatusOK, activity.String())
+		default:
+			c.NoContent(http.StatusNotAcceptable)
+		}
+		return nil
+	})
 }

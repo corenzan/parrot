@@ -11,6 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/corenzan/parrot/analytics"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	cache "github.com/patrickmn/go-cache"
 )
 
@@ -20,8 +23,8 @@ const (
 )
 
 var (
-	errorMissingAccessToken = errors.New("Missing Access Token")
-	errorEmpty              = errors.New("Empty")
+	errUnauthorized = errors.New("Unauthorized")
+	errEmpty        = errors.New("Empty")
 )
 
 // Activity ...
@@ -136,7 +139,7 @@ func (c *Client) SaveAccessToken(token string) (string, error) {
 		return "", err
 	}
 	if len(activity.Data) == 0 {
-		return "", errorEmpty
+		return "", errEmpty
 	}
 	username := activity.Data[0].User.Username
 	c.cache.token.Set(username, token, cache.DefaultExpiration)
@@ -154,7 +157,7 @@ func (c *Client) LatestActivity(username string) (*Activity, error) {
 		if value, ok := c.cache.token.Get(username); ok {
 			token = value.(string)
 		} else {
-			return nil, errorMissingAccessToken
+			return nil, errUnauthorized
 		}
 		req, err := c.NewRequest("GET", "/v1/users/self/media/recent/?count=9&access_token="+token, nil)
 		if err != nil {
@@ -185,46 +188,47 @@ func init() {
 	client = New()
 }
 
-// ServeHTTP ...
-func ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	basename := path.Base(r.URL.Path)
-	if r.Method == http.MethodPost && basename == "instagram" {
-		username, err := client.SaveAccessToken(r.FormValue("token"))
+// Route ...
+func Route(g *echo.Group) {
+	g.Use(middleware.CORS())
+	g.Use(analytics.Middleware())
+
+	g.GET("/", func(c echo.Context) error {
+		c.NoContent(http.StatusBadRequest)
+		return nil
+	})
+
+	g.POST("/", func(c echo.Context) error {
+		username, err := client.SaveAccessToken(c.FormValue("token"))
 		if err != nil {
 			panic(err)
 		}
-		w.Header().Set("Location", "/instagram/"+username)
-		w.WriteHeader(http.StatusTemporaryRedirect)
-		return
-	}
-	ext := path.Ext(basename)
-	username := strings.TrimSuffix(basename, ext)
-	if username == "instagram" {
-		http.NotFound(w, r)
-		return
-	}
-	activity, err := client.LatestActivity(username)
-	if err != nil {
-		if err == errorMissingAccessToken {
-			http.Error(w, "", http.StatusUnauthorized)
-			return
-		}
-		panic(err)
-	}
-	switch ext {
-	case ".html", "":
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprint(w, activity.HTML())
-	case ".json":
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		err := json.NewEncoder(w).Encode(activity.JSON())
+		c.Redirect(http.StatusTemporaryRedirect, "/instagram/"+username)
+		return nil
+	})
+
+	g.GET("/:basename", func(c echo.Context) error {
+		basename := c.Param("basename")
+		ext := path.Ext(basename)
+		username := strings.TrimSuffix(basename, ext)
+		activity, err := client.LatestActivity(username)
 		if err != nil {
+			if err == errUnauthorized {
+				c.NoContent(http.StatusNotFound)
+				return nil
+			}
 			panic(err)
 		}
-	case ".txt":
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		fmt.Fprint(w, activity.String())
-	default:
-		w.WriteHeader(http.StatusNotAcceptable)
-	}
+		switch ext {
+		case ".html", "":
+			c.HTML(http.StatusOK, activity.HTML())
+		case ".json":
+			c.JSON(http.StatusOK, activity.JSON())
+		case ".txt":
+			c.String(http.StatusOK, activity.String())
+		default:
+			c.NoContent(http.StatusNotAcceptable)
+		}
+		return nil
+	})
 }
